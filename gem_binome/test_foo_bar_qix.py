@@ -1,6 +1,6 @@
 import unittest
 
-from foo_bar_qix import FooBarQix
+from gem_binome.foo_bar_qix import FooBarQix
 
 class FooBarQixTest(unittest.TestCase):
 
