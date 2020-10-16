@@ -9,26 +9,27 @@ class FooBarQix(object):
             return "Foo"
         if number %5 == 0:
             return "Bar"
+        if number % 7 == 0:
+            return "Qix"
         return str(number)
 
 
 class FooBarQixTest(unittest.TestCase):
-    def test_should_return_number_when_number(self):
 
-        foo_bar_qix = FooBarQix()
-        actual = foo_bar_qix.generate(2)
-        self.assertEqual("2", actual)
+    def test_should_return_number_when_number(self):
+        self.assertEqual("2", self.foo_bar_qix.generate(2))
 
     def test_should_return_foo_when_divisible_by_three(self):
-
-        foo_bar_qix = FooBarQix()
-        actual = foo_bar_qix.generate(9)
-        self.assertEqual("Foo", actual)
+        self.assertEqual("Foo", self.foo_bar_qix.generate(9))
 
     def test_should_return_bar_when_divisible_by_five(self):
-        foo_bar_qix = FooBarQix()
-        actual = foo_bar_qix.generate(10)
-        self.assertEqual("Bar", actual)
+        self.assertEqual("Bar", self.foo_bar_qix.generate(10))
+
+    def test_should_return_qix_when_number_divisible_by_seven(self):
+        self.assertEqual("Qix", self.foo_bar_qix.generate(14))
+
+    def setUp(self):
+        self.foo_bar_qix = FooBarQix()
 
 if __name__ == '__main__':
     unittest.main()
