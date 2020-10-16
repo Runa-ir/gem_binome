@@ -1,17 +1,6 @@
 import unittest
 
-
-class FooBarQix(object):
-
-    def generate(self, number):
-
-        if number %3 == 0:
-            return "Foo"
-        if number %5 == 0:
-            return "Bar"
-        if number % 7 == 0:
-            return "Qix"
-        return str(number)
+from gem_binome.foo_bar_qix import FooBarQix
 
 
 class FooBarQixTest(unittest.TestCase):
