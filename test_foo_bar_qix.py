@@ -1,7 +1,6 @@
 import unittest
 
-from gem_binome.foo_bar_qix import FooBarQix
-
+from foo_bar_qix import FooBarQix
 
 class FooBarQixTest(unittest.TestCase):
 
@@ -16,6 +15,9 @@ class FooBarQixTest(unittest.TestCase):
 
     def test_should_return_qix_when_number_divisible_by_seven(self):
         self.assertEqual("Qix", self.foo_bar_qix.generate(14))
+
+    def test_should_return_foofoo_when_number_contains_three_and_is_divisible_by_three(self):
+        self.assertEqual("FooFoo", self.foo_bar_qix.generate(3))
 
     def setUp(self):
         self.foo_bar_qix = FooBarQix()
