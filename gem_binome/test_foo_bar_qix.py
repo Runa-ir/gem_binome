@@ -32,7 +32,7 @@ class FooBarQixTest(unittest.TestCase):
         self.assertEqual("BarFoo", self.foo_bar_qix.generate(53))
 
     def setUp(self):
-        self.foo_bar_qix = FooBarQix()
+        self.foo_bar_qix = FooBarQix({3: "Foo", 5: "Bar", 7: "Qix"})
 
 if __name__ == '__main__':
     unittest.main()
