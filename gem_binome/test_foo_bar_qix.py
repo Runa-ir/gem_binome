@@ -31,8 +31,14 @@ class FooBarQixTest(unittest.TestCase):
     def test_should_return_foobar_when_number_contains_three_and_five(self):
         self.assertEqual("BarFoo", self.foo_bar_qix.generate(53))
 
+    def test_if_it_works_with_another_map(self):
+        new_map = {3: "Fizz", 5: "Buzz"}
+        foobar = FooBarQix(new_map)
+        self.assertEqual("FizzBuzzBuzz", foobar.generate(15))
+
     def setUp(self):
         self.foo_bar_qix = FooBarQix({3: "Foo", 5: "Bar", 7: "Qix"})
+
 
 if __name__ == '__main__':
     unittest.main()
