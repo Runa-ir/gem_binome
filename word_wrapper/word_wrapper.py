@@ -19,3 +19,10 @@ class WordWrapper(object):
 
             return words[:index_of_breaking_space] + '\n' + words[index_of_breaking_space + 1:]
         return words
+
+
+    def my_rindex(self, words, column_number):
+        try:
+            return words.rindex(" ", 0, column_number + 1), 0
+        except ValueError:
+            return column_number, 1
