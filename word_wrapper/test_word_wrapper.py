@@ -17,7 +17,7 @@ class TestsWordWrapper(unittest.TestCase):
         column_number = 5
         wrapper = WordWrapper()
         actual_string = wrapper.wrap(input_string, column_number)
-        self.assertEqual("dummy\nstring", actual_string)
+        self.assertEqual("dummy\nstrin\ng", actual_string)
 
     def test_break_at_boundary_when_column_number_does_not_match_a_spoce_position_between_two_words(self):
         input_string = "dummy string"

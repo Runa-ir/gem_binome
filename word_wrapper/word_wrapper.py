@@ -1,28 +1,30 @@
 """WordWrapper class"""
+import textwrap
 
 class WordWrapper(object):
 
+    def wrap_w_standard_lib(self, words, column_number):
+        return textwrap.fill(words, column_number)
+
     def wrap(self, words, column_number):
         if len(words) > column_number:
-            try:
-                index_of_breaking_space = words.rindex(" ", 0, column_number + 1)
-            except ValueError:
-                i = 0
-                length = len(words)
-                composition = ""
-                while length > 0:
-                    i += column_number
-                    composition = composition + words[i-column_number:i] + '\n'
-                    length -= column_number
+            i = 0
+            length = len(words)
+            composition = ""
+            while length > 0:
+                index_of_breaking_space, offset = self.my_rindex(words, column_number, i)
 
-                return composition[:len(composition)-len('\n')]
+                i += index_of_breaking_space
+                composition = composition + words[i - index_of_breaking_space + offset:i+offset] + '\n'
+                length -= index_of_breaking_space
 
-            return words[:index_of_breaking_space] + '\n' + words[index_of_breaking_space + 1:]
+            return composition[:len(composition)-len('\n')]
+
         return words
 
 
-    def my_rindex(self, words, column_number):
+    def my_rindex(self, words, column_number, index):
         try:
-            return words.rindex(" ", 0, column_number + 1), 0
+            return words.rindex(" ", index+1, column_number + 1), 0
         except ValueError:
             return column_number, 1
