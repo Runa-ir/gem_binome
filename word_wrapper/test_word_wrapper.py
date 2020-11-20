@@ -1,6 +1,6 @@
 import unittest
 
-from word_wrapper.word_wrapper import WordWrapper
+from word_wrapper import WordWrapper
 
 
 class TestsWordWrapper(unittest.TestCase):
