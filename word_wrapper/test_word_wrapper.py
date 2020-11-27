@@ -1,6 +1,6 @@
 import unittest
 
-from word_wrapper import WordWrapper
+from word_wrapper.word_wrapper import WordWrapper
 
 
 class TestsWordWrapper(unittest.TestCase):
@@ -17,14 +17,30 @@ class TestsWordWrapper(unittest.TestCase):
         column_number = 5
         wrapper = WordWrapper()
         actual_string = wrapper.wrap(input_string, column_number)
-        self.assertEqual("dummy\nstrin\ng", actual_string)
+        self.assertEqual("dummy\n stri\nng", actual_string)
 
-    def test_break_at_boundary_when_column_number_does_not_match_a_spoce_position_between_two_words(self):
+    def test_break_at_boundary_when_column_number_does_not_match_a_space_position_between_two_words(self):
         input_string = "dummy string"
         column_number = 7
         wrapper = WordWrapper()
         actual_string = wrapper.wrap(input_string, column_number)
-        self.assertEqual("dummy\nstring", actual_string)
+        self.assertEqual("dummy \nstring", actual_string)
+
+    def test_leave_space_if_multiple_spaces_between_words(self):
+        spaces = " " * 3
+        input_string = f"dummy{spaces}string"
+        column_number = 7
+        wrapper = WordWrapper()
+        actual_string = wrapper.wrap(input_string, column_number)
+        self.assertEqual("dummy  \n string", actual_string)
+
+    def test_leave_extra_line_of_spaces_if_multiple_spaces_between_words(self):
+        spaces = " " * 5
+        input_string = f"dummy{spaces}string"
+        column_number = 7
+        wrapper = WordWrapper()
+        actual_string = wrapper.wrap(input_string, column_number)
+        self.assertEqual("dummy  \n   \nstring", actual_string)
 
     def test_should_wrap_the_word_if_column_number_smaller_than_first_space_index(self):
         input_string = "dummy"
