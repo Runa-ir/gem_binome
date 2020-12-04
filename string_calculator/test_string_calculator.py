@@ -16,6 +16,14 @@ class StringCalculatorTestCase(unittest.TestCase):
     def test_should_handle_new_lines_between_numbers(self):
         self.assertEqual(6, StringCalculator().add("1\n2,3"))
 
+    def test_should_handle_new_separator_if_provided(self):
+        self.assertEqual(3, StringCalculator().add("//;\n1;2"))
+
+    def test_should_throw_exception_if_negative_numbers_are_passed(self):
+        with self.assertRaises(Exception) as context:
+            StringCalculator().add("-1,2")
+        self.assertEqual("Negatives not allowed: -1", context.exception.args[0])
+
 
 if __name__ == '__main__':
     unittest.main()
