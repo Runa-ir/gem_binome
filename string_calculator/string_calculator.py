@@ -8,16 +8,27 @@ class StringCalculator(object):
         if not numbers:
             return 0
 
-        regex = ",|\n"
-        if numbers.startswith('//'):
-            separator = numbers.split("\n", 1)[0][2:]
-            numbers = numbers.split("\n", 1)[1]
-            regex += f"|{separator}"
+        numbers, regex = self._extract_delimiter(numbers)
+        integers = self._extract_integers(numbers, regex)
+        self._handle_negatives(integers)
 
-        integers = [int(num) for num in re.split(regex, numbers)]
+        return sum(integers)
+
+    def _extract_integers(self, numbers, regex):
+        integers = [int(num) for num in re.split(regex, numbers) if int(num) < 1000]
+        return integers
+
+    def _handle_negatives(self, integers):
         negatives = [num for num in integers if num < 0]
-
         if negatives:
             raise Exception(f"Negatives not allowed: {','.join(map(str, negatives))}")
 
-        return sum(integers)
+    def _extract_delimiter(self, numbers):
+        regex = ",|\n"
+        if numbers.startswith('//'):
+            delimiter = numbers.split("\n", 1)[0][2:]
+            numbers = numbers.split("\n", 1)[1]
+            regex += f"|{delimiter}"
+        return numbers, regex
+
+
