@@ -4,24 +4,38 @@ class BowlingGame(object):
 
     def __init__(self):
         self.points = 0
-        self.last_rolls = []
+        self.rolls_history = []
+        self.round_history = []
         self.nb_strikes = 0
 
     def roll(self, pins):
         self.points += pins
 
-        last_two_rolls = self.last_rolls[-2:]
+        self.update_round_history(pins)
+        # pins = [10, 5, 3, 10, 5, 0] [(10,), (5, 3), (10,), (5, 0)]
+
+
+        last_two_rolls = self.rolls_history[-2:]
         if 10 in last_two_rolls:
             for i in range(last_two_rolls.count(10)):
                 self.points += pins
         else:
-            if len(self.last_rolls) and (len(self.last_rolls) + self.nb_strikes) % 2 == 0:
+            if len(self.rolls_history) and (len(self.rolls_history) + self.nb_strikes) % 2 == 0:
                 if sum(last_two_rolls) == 10:
                     self.points += pins
 
-        self.last_rolls.append(pins)
+        self.rolls_history.append(pins)
         if pins == 10:
             self.nb_strikes += 1
+
+    def update_round_history(self, pins):
+        new_round_criteria = (
+                    not self.round_history or sum(self.round_history[-1]) == 10 or len(self.round_history[-1]) == 2
+        )
+        if new_round_criteria:
+            self.round_history.append((pins,))
+        else:
+            self.round_history[-1] += (pins,)
 
     def score(self):
         return self.points
@@ -62,6 +76,10 @@ class TestBowlingGame(unittest.TestCase):
         bowling_game = self.play_bowling_game(pins)
         self.assertEqual(32, bowling_game.score())
 
+        pins = [0, 10, 5, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        bowling_game = self.play_bowling_game(pins)
+        self.assertEqual(22, bowling_game.score())
+
     def test_strike_result(self):
         pins = [10, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         bowling_game = self.play_bowling_game(pins)
@@ -84,9 +102,11 @@ class TestBowlingGame(unittest.TestCase):
         bowling_game = self.play_bowling_game(pins)
         self.assertEqual(64, bowling_game.score())
 
-        pins = [0, 10, 5, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    def test_update_round_history(self):
+        pins = [10, 5, 5, 10, 5, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         bowling_game = self.play_bowling_game(pins)
-        self.assertEqual(22, bowling_game.score())
+        expected_round_history = [(10,), (5, 5), (10,), (5, 2), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
+        self.assertEqual(expected_round_history, bowling_game.round_history)
 
 
 if __name__ == '__main__':
