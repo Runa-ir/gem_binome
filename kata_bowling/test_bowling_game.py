@@ -1,32 +1,46 @@
 import unittest
+from typing import Tuple, Optional
+
 
 class BowlingGame(object):
 
     def __init__(self):
         self.points = 0
-        self.rolls_history = []
         self.round_history = []
-        self.nb_strikes = 0
 
     def roll(self, pins):
         self.points += pins
 
+        pre_round = self.define_pre_round()
+        pre_pre_round = self.define_pre_pre_round()
+
+        self.deal_with_possible_strike(pins, pre_pre_round, pre_round)
+        self.deal_with_possible_spare(pins, pre_round)
+
         self.update_round_history(pins)
-        # pins = [10, 5, 3, 10, 5, 0] [(10,), (5, 3), (10,), (5, 0)]
 
+    def define_pre_round(self) -> Optional[Tuple]:
+        if len(self.round_history) > 0:
+            return self.round_history[-1]
+        return None
 
-        last_two_rolls = self.rolls_history[-2:]
-        if 10 in last_two_rolls:
-            for i in range(last_two_rolls.count(10)):
+    def define_pre_pre_round(self) -> Optional[Tuple]:
+        if len(self.round_history) > 1:
+            return self.round_history[-2]
+        return None
+
+    def deal_with_possible_strike(self, pins, pre_pre_round, pre_round):
+        if pre_pre_round:
+            if len(pre_pre_round) == 1 and pre_pre_round[0] == 10 and len(pre_round) == 1:
                 self.points += pins
-        else:
-            if len(self.rolls_history) and (len(self.rolls_history) + self.nb_strikes) % 2 == 0:
-                if sum(last_two_rolls) == 10:
-                    self.points += pins
+        if pre_round:
+            if len(pre_round) == 1 and pre_round[0] == 10:
+                self.points += pins
 
-        self.rolls_history.append(pins)
-        if pins == 10:
-            self.nb_strikes += 1
+    def deal_with_possible_spare(self, pins, pre_round):
+        if pre_round:
+            if len(pre_round) == 2 and sum(pre_round) == 10:
+                self.points += pins
 
     def update_round_history(self, pins):
         new_round_criteria = (
@@ -37,7 +51,7 @@ class BowlingGame(object):
         else:
             self.round_history[-1] += (pins,)
 
-    def score(self):
+    def score(self) -> int:
         return self.points
 
 class TestBowlingGame(unittest.TestCase):
@@ -81,9 +95,9 @@ class TestBowlingGame(unittest.TestCase):
         self.assertEqual(22, bowling_game.score())
 
     def test_strike_result(self):
-        pins = [10, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        bowling_game = self.play_bowling_game(pins)
-        self.assertEqual(18, bowling_game.score())
+        # pins = [10, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        # bowling_game = self.play_bowling_game(pins)
+        # self.assertEqual(18, bowling_game.score())
 
         pins = [10, 4, 5, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         bowling_game = self.play_bowling_game(pins)
@@ -106,6 +120,11 @@ class TestBowlingGame(unittest.TestCase):
         pins = [10, 5, 5, 10, 5, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         bowling_game = self.play_bowling_game(pins)
         expected_round_history = [(10,), (5, 5), (10,), (5, 2), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
+        self.assertEqual(expected_round_history, bowling_game.round_history)
+
+        pins = [0, 10, 5, 5, 10, 5, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        bowling_game = self.play_bowling_game(pins)
+        expected_round_history = [(0, 10), (5, 5), (10,), (5, 2), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
         self.assertEqual(expected_round_history, bowling_game.round_history)
 
 
