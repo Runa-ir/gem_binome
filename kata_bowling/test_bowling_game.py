@@ -61,6 +61,7 @@ class BowlingGame(object):
     def score(self) -> int:
         return self.points
 
+
 class TestBowlingGame(unittest.TestCase):
 
     def play_bowling_game(self, pins_list):
