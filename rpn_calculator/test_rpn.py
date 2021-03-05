@@ -20,38 +20,47 @@ def divide(a, b):
 map_operation = {"*": multiply, "-": subtract, "/": divide, "+": sum}
 
 
-class RPNEvaluator(object):
+def evaluate(expression):
+    separate_symbols = expression.split(" ")
 
-    def evaluate(self, expression):
-        separate_symbols = expression.split(" ")
-        last_char = separate_symbols[-1]
-        if last_char in map_operation.keys():
-            return map_operation[last_char](separate_symbols[0], separate_symbols[1])
-        return "".join(separate_symbols)
+    stack = []
+    for symbol in separate_symbols:
+        if symbol not in map_operation.keys():
+            stack.append(symbol)
+        else:
+            right = stack.pop()
+            left = stack.pop()
+            stack.append(map_operation[symbol](left, right))
+
+    return "".join(stack)
 
 
 class TestRPN(unittest.TestCase):
 
     def test_get_number_when_number_given(self):
-        rpn = RPNEvaluator()
-        result = rpn.evaluate("3")
+        result = evaluate("3")
         self.assertEqual("3", result)
 
     def test_get_number_formed_by_digits(self):
-        rpn = RPNEvaluator()
-        result = rpn.evaluate("3 4 5")
+        result = evaluate("3 4 5")
         self.assertEqual("345", result)
 
     def test_get_new_line_when_enter_given(self):
-        rpn = RPNEvaluator()
-        result = rpn.evaluate("3\n4 5")
+        result = evaluate("3\n4 5")
         self.assertEqual(result, "3\n45")
 
     def test_get_math_operation_when_operator_is_given_between_two_numbers(self):
-        rpn = RPNEvaluator()
-        result = rpn.evaluate("20 5 /")
+        result = evaluate("20 5 /")
         self.assertEqual(result, "4")
 
+        result = evaluate("20 5 / 3 -")
+        self.assertEqual(result, "1")
+
+        result = evaluate("4 2 + 3 -")
+        self.assertEqual(result, "3")
+
+        result = evaluate("3 5 8 * 7 + *")
+        self.assertEqual(result, "141")
 
 if __name__ == '__main__':
     unittest.main()
