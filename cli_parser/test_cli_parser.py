@@ -8,7 +8,19 @@ class CLIParser(object):
         self.schema = schema
 
     def set_cli(self, cli):
-        parsed_cli = cli.split("-")
+        parsed_cli = []
+        i = 0
+        block = ""
+        for char in cli:
+            if char == "-" and not cli[i+1].isnumeric():
+                parsed_cli.append(block)
+                i += 1
+                block = ""
+                continue
+            block += char
+            i += 1
+        parsed_cli.append(block)
+
         for item in parsed_cli:
             split_flag = item.split(" ")
             flag = split_flag[0]
@@ -73,6 +85,18 @@ class TestCLIParser(unittest.TestCase):
         cli_parser = CLIParser({"g": [str]})
         cli_parser.set_cli("-g this,is,a,list")
         self.assertEqual(["this", "is", "a", "list"], cli_parser.evaluate_flag("g"))
+
+    def test_cli_is_split_correctly_with_minus_in_values(self):
+        cli_parser = CLIParser({"d": int})
+        cli_parser.set_cli("-d -3")
+        self.assertEqual(-3, cli_parser.evaluate_flag("d"))
+
+
+    def test_should_return_multiple_collections_when_multiple_collection_flag(self):
+        cli_parser = CLIParser({"g": [str], "d": [int]})
+        cli_parser.set_cli("-g this,is,a,list -d 1,2,-3,5")
+        self.assertEqual(["this", "is", "a", "list"], cli_parser.evaluate_flag("g"))
+        self.assertEqual([1, 2, -3, 5], cli_parser.evaluate_flag("d"))
 
 
 if __name__ == '__main__':
