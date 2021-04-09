@@ -8,22 +8,16 @@ class CLIParser(object):
         self.schema = schema
 
     def set_cli(self, cli):
-        parsed_cli = []
-        i = 0
-        block = ""
-        for char in cli:
-            if char == "-" and not cli[i+1].isnumeric():
-                parsed_cli.append(block)
-                i += 1
-                block = ""
-                continue
-            block += char
-            i += 1
-        parsed_cli.append(block)
+        parsed_cli = self.extract_flags(cli)
+        self.evaluate_all_flags(parsed_cli)
 
+    def evaluate_all_flags(self, parsed_cli):
         for item in parsed_cli:
             split_flag = item.split(" ")
             flag = split_flag[0]
+            if flag not in self.schema.keys():
+                raise Exception(f"Unknown flag has been passed: flag -{flag} is not in the schema")
+
             value = True
             if len(split_flag) > 1:
                 if split_flag[1]:
@@ -31,16 +25,28 @@ class CLIParser(object):
 
             self.flags[flag] = value
 
+    @staticmethod
+    def extract_flags(cli):
+        parsed_cli = []
+        i = 0
+        block = ""
+        for char in cli:
+            if char == "-" and not cli[i + 1].isnumeric():
+                parsed_cli.append(block)
+                i += 1
+                block = ""
+                continue
+            block += char
+            i += 1
+        parsed_cli.append(block)
+        return parsed_cli[1:]
+
     def evaluate_flag(self, flag):
         flag_type = self.schema[flag]
 
         if type(flag_type) == list:
             flag_type = flag_type[0]
-
-            collection = []
-            for val in self.flags[flag].split(","):
-                collection.append(self.cast(val, flag_type))
-            return collection
+            return [self.cast(val, flag_type) for val in self.flags[flag].split(",")]
 
         if flag not in self.flags.keys():
             return False
@@ -48,7 +54,6 @@ class CLIParser(object):
         return self.cast(self.flags[flag], flag_type)
 
     def cast(self, value, new_type):
-
         return new_type(value)
 
 
@@ -91,12 +96,17 @@ class TestCLIParser(unittest.TestCase):
         cli_parser.set_cli("-d -3")
         self.assertEqual(-3, cli_parser.evaluate_flag("d"))
 
-
     def test_should_return_multiple_collections_when_multiple_collection_flag(self):
         cli_parser = CLIParser({"g": [str], "d": [int]})
         cli_parser.set_cli("-g this,is,a,list -d 1,2,-3,5")
         self.assertEqual(["this", "is", "a", "list"], cli_parser.evaluate_flag("g"))
         self.assertEqual([1, 2, -3, 5], cli_parser.evaluate_flag("d"))
+
+    def test_should_raise_an_exception_if_flag_is_not_in_schema(self):
+        cli_parser = CLIParser({"g": str, "d": [int]})
+        with self.assertRaises(Exception) as context:
+            cli_parser.set_cli("-f this,is,not,a,flag")
+        self.assertEqual("Unknown flag has been passed: flag -f is not in the schema", context.exception.args[0])
 
 
 if __name__ == '__main__':
